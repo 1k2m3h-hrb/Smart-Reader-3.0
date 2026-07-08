@@ -45,7 +45,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-ai_client = genai.Client"AIzaSyB9wGRfI3_ukuAwXBpVKDHTcGCH3pmUrjY"
+ai_client = genai.Client(api_key="AIzaSyB9wGRfI3_ukuAwXBpVKDHTcGCH3pmUrjY")
 
 def get_db():
     db = SessionLocal()
