@@ -54,24 +54,20 @@ def get_db():
     finally:
         db.close()
 
+from fastapi import UploadFile, File
+
 @app.post("/api/upload")
-def upload_and_ocr(project_id: int = Form(...), file: UploadFile = File(...), db: Session = Depends(get_db)):
+async def upload_file(file: UploadFile = File(...)):
     try:
-        image_bytes = file.file.read()
-        image = Image.open(io.BytesIO(image_bytes))
+        # قراءة محتوى الملف المرفوع
+        contents = await file.read()
         
-        prompt = """
-        أنت محقق مخطوطات خبير. استخرج النص العربي من هذه الصورة بدقة فائقة وبأعلى جودة ممكنة.
-        حافظ على علامات الترقيم، وقدم النص مشكولاً شكلاً صحيحاً. اكتفِ بالنص المستخرج فقط.
-        """
-        response = ai_client.models.generate_content(model='gemini-2.5-flash', contents=[image, prompt])
-        extracted = response.text
-        
-        doc = Document(project_id=project_id, file_name=file.filename, extracted_text=extracted)
-        db.add(doc)
-        db.commit()
-        
-        return {"document_id": doc.id, "extracted_text": extracted}
+        # هنا يتم حفظ الملف أو التعامل معه، تأكد من أن الكود الداخلي سليم
+        # على سبيل المثال، إذا كنت تحفظ الملف:
+        with open(f"uploads/{file.filename}", "wb") as f:
+            f.write(contents)
+            
+        return {"status": "success", "filename": file.filename}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
